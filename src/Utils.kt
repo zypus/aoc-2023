@@ -32,6 +32,12 @@ data class AoCTask(val day: String) {
     fun <T> withInput(block: (Sequence<String>) -> T): T {
         return processInput(inputFileName, block)
     }
+
+    fun check(actual: Int, expected: Int) {
+        if (actual != expected) {
+            throw RuntimeException("Expected $expected, got $actual")
+        }
+    }
 }
 
 /**
