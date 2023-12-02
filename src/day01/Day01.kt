@@ -6,8 +6,8 @@ import AoCTask
 
 fun part1(input: List<String>): Int {
     return input.sumOf { line ->
-        val digits = line.filter { it.isDigit() }
-        "${digits.first()}${digits.last()}".toInt()
+        val digits = line.filter { it.isDigit() }.map { it.toString().toInt() }
+        digits.first() * 10 + digits.last()
     }
 }
 
@@ -15,28 +15,11 @@ val numbers = listOf("one", "two", "three", "four", "five", "six", "seven", "eig
 
 fun part2(input: List<String>): Int {
     return input.sumOf { line ->
-        val digits = mutableListOf<Int>()
-        var currentLine = line
-        while (currentLine.isNotEmpty()) {
-            val first = currentLine.first()
-            currentLine = if (first.isDigit()) {
-                digits.add(first.toString().toInt())
-                currentLine.drop(1)
-            } else {
-                val index = numbers.indexOfFirst { currentLine.startsWith(it) }
-                if (index >= 0) {
-                    digits.add(index+1)
-                    // NOTE: numbers may overlap, hence we cannot just drop all chars of the number
-                    // currentLine.drop(numbers[index].length)
-                    currentLine.drop(1)
-                } else {
-                    currentLine.drop(1)
-                }
-            }
+        val newLine = numbers.foldIndexed(line) { index, acc, number ->
+            acc.replace(number, "$number${index+1}$number")
         }
-        val value = digits.first() * 10 + digits.last()
-        println("$line -> $digits -> $value")
-        value
+        val digits = newLine.filter { it.isDigit() }.map { it.toString().toInt() }
+        digits.first() * 10 + digits.last()
     }
 }
 
