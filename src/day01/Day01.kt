@@ -14,13 +14,11 @@ fun part1(input: List<String>): Int {
 val numbers = listOf("one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
 
 fun part2(input: List<String>): Int {
-    return input.sumOf { line ->
-        val newLine = numbers.foldIndexed(line) { index, acc, number ->
-            acc.replace(number, "$number${index+1}$number")
+    return part1(input.map { line ->
+        numbers.foldIndexed(line) { index, acc, number ->
+            acc.replace(number, "${number.first()}${index+1}${number.last()}")
         }
-        val digits = newLine.filter { it.isDigit() }.map { it.toString().toInt() }
-        digits.first() * 10 + digits.last()
-    }
+    })
 }
 
 fun main() = AoCTask("day01").run {
