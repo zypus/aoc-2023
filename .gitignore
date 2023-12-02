@@ -2,5 +2,6 @@
 .idea
 build
 src/**/*.txt
+*.py
 
 .session

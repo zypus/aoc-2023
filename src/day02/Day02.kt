@@ -1,32 +1,35 @@
 package day02
 
 import AoCTask
-import println
 
 // https://adventofcode.com/2023/day/2
 
-data class Game(val id: Int, val draws: List<Draw>)
+data class Game(
+    val id: Int,
+    val draws: List<Draw>
+)
 
-data class Draw(val reds: Int, val greens: Int, val blues: Int)
+data class Draw(
+    val reds: Int,
+    val greens: Int,
+    val blues: Int
+)
 
 fun parseGames(input: List<String>): List<Game> {
     return input.map { line ->
         val (game, drawsString) = line.split(":")
         val id = game.split(" ").last().toInt()
-        val draws = drawsString.split(";").map {
-            val counts = it.split(",").map { it.trim() }
-            var reds = 0
-            var greens = 0
-            var blues = 0
-            counts.map {
+        val draws = drawsString.split(";").map { draw ->
+            val counts = draw.split(",").map { it.trim() }
+            val colorCounts = counts.associate {
                 val (count, color) = it.split(" ")
-                when(color) {
-                    "red" -> reds = count.toInt()
-                    "green" -> greens = count.toInt()
-                    "blue" -> blues = count.toInt()
-                }
+                color to count.toInt()
             }
-            Draw(reds, greens, blues)
+            Draw(
+                colorCounts.getOrDefault("red", 0),
+                colorCounts.getOrDefault("green", 0),
+                colorCounts.getOrDefault("blue", 0)
+            )
         }
         Game(id, draws)
     }
