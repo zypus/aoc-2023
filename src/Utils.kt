@@ -38,12 +38,34 @@ data class AoCTask(val day: String) {
             throw RuntimeException("Expected $expected, got $actual")
         }
     }
+    fun check(actual: Long, expected: Long) {
+        if (actual != expected) {
+            throw RuntimeException("Expected $expected, got $actual")
+        }
+    }
 }
 
 /**
  * Converts string to md5 hash.
  */
 fun String.md5(): String = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteArray())).toString(16)
+
+fun <E> Collection<E>.split(limit: Int = -1, condition: (E) -> Boolean): List<List<E>> {
+    val splits = mutableListOf<List<E>>()
+    var currentSplit = mutableListOf<E>()
+    for (element in this) {
+        if (condition(element) && (limit == -1 || splits.size - 1 < limit)) {
+            splits.add(currentSplit)
+            currentSplit = mutableListOf()
+        } else {
+            currentSplit.add(element)
+        }
+    }
+    if (currentSplit.isNotEmpty()) {
+        splits.add(currentSplit)
+    }
+    return splits
+}
 
 data class Vector2(val x: Int = 0, val y: Int = 0) {
     override fun toString(): String {
