@@ -4,21 +4,42 @@ import AoCTask
 
 // https://adventofcode.com/2023/day/6
 
+const val WHITESPACE_PATTERN = "\\s+"
+
+/**
+ * Calculates the score based on the input lists of moments and distances.
+ *
+ * @param input The list of strings containing the input data. The first string should contain the moments separated by a colon (':').
+ *              The last string should contain the distances separated by a colon (':').
+ * @return The calculated score.
+ */
 fun part1(input: List<String>): Int {
-    val times = input.first().split(":").last().trim().split("\\s+".toRegex()).map { it.toInt() }
-    val distances = input.last().split(":").last().trim().split("\\s+".toRegex()).map { it.toInt() }
-    return times.zip(distances).map { (time, highscore) ->
-        (0..time).map { holdTime ->
-            val distanceTraveled = (time - holdTime) * holdTime
-            distanceTraveled
-        }.count {
-            it > highscore
-        }
-    }.fold(1) {
-        acc, it -> acc * it
-    }
+    val momentList = convertToIntegerList(input.first())
+    val distanceList = convertToIntegerList(input.last())
+
+    return momentList.zip(distanceList).map { (moment, threshold) ->
+        val scoreCounts = (0..moment).map { holdingTime ->
+            val traveledDistance = (moment - holdingTime) * holdingTime
+            traveledDistance
+        }.count { it > threshold }
+        scoreCounts
+    }.reduce { accumulated, score -> accumulated * score }
 }
 
+private fun convertToIntegerList(inputString: String): List<Int> {
+    val lastTerm = inputString.split(":").last()
+    val trimmedResult = lastTerm.trim()
+    val splitByWhitespace = trimmedResult.split(WHITESPACE_PATTERN.toRegex())
+
+    return splitByWhitespace.map { it.toInt() }
+}
+
+/**
+ * Calculates the range of holding times that result in a score higher than the given highscore.
+ *
+ * @param input The list of strings containing the input data. The first string should contain the time and highscore separated by a colon (':').
+ * @return The range of holding times that result in a score higher than the given highscore.
+ */
 fun part2(input: List<String>): Long {
     val time = input.first().split(":").last().replace("\\s+".toRegex(), "").toLong()
     val highscore = input.last().split(":").last().replace("\\s+".toRegex(), "").toLong()
