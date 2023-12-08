@@ -118,3 +118,5 @@ fun <T> List<T>.permutations(): List<List<T>> {
  * The cleaner shorthand for printing output.
  */
 fun Any?.println() = println(this)
+
+fun <E> Collection<E>.printlnEach() = forEach { println(it) }
