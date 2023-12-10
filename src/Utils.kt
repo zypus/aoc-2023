@@ -84,6 +84,10 @@ data class Vector2(val x: Int = 0, val y: Int = 0) {
 operator fun Vector2.plus(other: Vector2) = Vector2(x + other.x, y + other.y)
 operator fun Vector2.minus(other: Vector2) = Vector2(x - other.x, y - other.y)
 
+operator fun Vector2.times(factor: Int) = Vector2(x * factor, y * factor)
+
+operator fun Int.times(vector: Vector2) = Vector2(vector.x * this, vector.y * this)
+
 data class Vector3(val x: Int = 0, val y: Int = 0, val z: Int = 0) {
     override fun toString(): String {
         return "($x,$y,$z)"
