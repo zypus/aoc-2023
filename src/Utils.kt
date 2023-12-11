@@ -1,6 +1,7 @@
 import java.io.File
 import java.math.BigInteger
 import java.security.MessageDigest
+import kotlin.math.abs
 
 data class AoCTask(val day: String) {
 
@@ -87,6 +88,35 @@ operator fun Vector2.minus(other: Vector2) = Vector2(x - other.x, y - other.y)
 operator fun Vector2.times(factor: Int) = Vector2(x * factor, y * factor)
 
 operator fun Int.times(vector: Vector2) = Vector2(vector.x * this, vector.y * this)
+
+fun Vector2.manhattanDistanceTo(other: Vector2) = abs(x - other.x) + abs(y - other.y)
+
+
+data class Vector2L(val x: Long = 0L, val y: Long = 0L) {
+
+    constructor(x: Number, y: Number) : this(x.toLong(), y.toLong())
+
+    override fun toString(): String {
+        return "($x,$y)"
+    }
+
+    companion object {
+        val ZERO = Vector2L(0, 0)
+        val LEFT = Vector2L(-1, 0)
+        val RIGHT = Vector2L(1, 0)
+        val UP = Vector2L(0, -1)
+        val DOWN = Vector2L(0, 1)
+    }
+}
+
+operator fun Vector2L.plus(other: Vector2L) = Vector2L(x + other.x, y + other.y)
+operator fun Vector2L.minus(other: Vector2L) = Vector2L(x - other.x, y - other.y)
+
+operator fun Vector2L.times(factor: Int) = Vector2L(x * factor, y * factor)
+
+operator fun Int.times(vector: Vector2L) = Vector2L(vector.x * this, vector.y * this)
+
+fun Vector2L.manhattanDistanceTo(other: Vector2L) = abs(x - other.x) + abs(y - other.y)
 
 data class Vector3(val x: Int = 0, val y: Int = 0, val z: Int = 0) {
     override fun toString(): String {
