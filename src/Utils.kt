@@ -148,6 +148,15 @@ fun <T> List<T>.permutations(): List<List<T>> {
     }
 }
 
+fun List<String>.transpose(): List<String> {
+    val transposed = MutableList(first().length) { "" }
+    forEach { line ->
+        line.forEachIndexed { index, c ->
+            transposed[index] = transposed[index] + c
+        }
+    }
+    return transposed
+}
 /**
  * The cleaner shorthand for printing output.
  */

@@ -4,12 +4,12 @@ import AoCTask
 
 // <link>
 
-fun part1(input: List<String>): Long {
-    return input.size.toLong()
+fun part1(input: List<String>): Int {
+    return input.size
 }
 
-fun part2(input: List<String>): Long {
-    return input.size.toLong()
+fun part2(input: List<String>): Int {
+    return input.size
 }
 
 fun main() = AoCTask("day00").run {
