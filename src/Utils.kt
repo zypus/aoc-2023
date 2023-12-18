@@ -244,20 +244,6 @@ fun eightWayNeighbourhood(pos: Vector2): List<Vector2> {
     return EIGHTWAY_DIRECTIONS.map { pos + it }
 }
 
-class MutableMapWithDefault<K, V>(val map: MutableMap<K,V>, val default: () -> V) : MutableMap<K, V> by map {
-    override fun get(key: K): V {
-        return map.getOrElse(key, default)
-    }
-}
-
-fun <K, V> MutableMap<K,V>.withDefault(default: () -> V): MutableMapWithDefault<K, V> {
-    return if (this is MutableMapWithDefault) {
-        MutableMapWithDefault(map, default)
-    } else {
-        MutableMapWithDefault(this, default)
-    }
-}
-
 fun <L> aStar(
     start: L,
     isGoal: (L) -> Boolean,
@@ -269,7 +255,7 @@ fun <L> aStar(
     val gScore = mutableMapOf<L, Int>().withDefault { Int.MAX_VALUE }
     val fScore = mutableMapOf<L, Int>().withDefault { Int.MAX_VALUE }
     val openSet = PriorityQueue<L> {
-        a, b -> fScore[a].compareTo(fScore[b])
+        a, b -> fScore.getValue(a).compareTo(fScore.getValue(b))
     }
     gScore[start] = 0
     fScore[start] = heuristic(start)
@@ -281,8 +267,8 @@ fun <L> aStar(
             return reconstructPath(cameFrom, current)
         }
         neighbourhood(current).forEach { neighbour ->
-            val tentativeGScore = gScore[current] + cost(current, neighbour)
-            if (tentativeGScore < gScore[neighbour]) {
+            val tentativeGScore = gScore.getValue(current) + cost(current, neighbour)
+            if (tentativeGScore < gScore.getValue(neighbour)) {
                 cameFrom[neighbour] = current
                 gScore[neighbour] = tentativeGScore
                 fScore[neighbour] = tentativeGScore + heuristic(neighbour)
