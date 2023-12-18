@@ -1,6 +1,7 @@
 import java.io.File
 import java.math.BigInteger
 import java.security.MessageDigest
+import java.util.*
 import kotlin.math.abs
 
 data class AoCTask(val day: String) {
@@ -80,10 +81,13 @@ data class Vector2(val x: Int = 0, val y: Int = 0) {
         val UP = Vector2(0, -1)
         val DOWN = Vector2(0, 1)
     }
+
+    val manhattanLength: Int get() = abs(x) + abs(y)
 }
 
 operator fun Vector2.plus(other: Vector2) = Vector2(x + other.x, y + other.y)
 operator fun Vector2.minus(other: Vector2) = Vector2(x - other.x, y - other.y)
+operator fun Vector2.unaryMinus(): Vector2 = Vector2(-x, -y)
 
 operator fun Vector2.times(factor: Int) = Vector2(x * factor, y * factor)
 
@@ -163,3 +167,133 @@ fun List<String>.transpose(): List<String> {
 fun Any?.println() = println(this)
 
 fun <E> Collection<E>.printlnEach() = forEach { println(it) }
+
+class Grid<T>(cells2D: List<List<T>>): Collection<T> {
+
+    val width: Int = cells2D.getOrNull(0)?.size ?: 0
+    val height: Int = cells2D.size
+
+    val cells: List<T> = cells2D.flatten()
+    operator fun get(x: Int, y: Int): T = cells[y * width + x]
+    fun getOrNull(x: Int, y: Int): T? = if (x in 0..<width && y in 0..<height) {
+        get(x, y)
+    } else {
+        null
+    }
+
+    operator fun get(position: Vector2): T = get(position.x, position.y)
+    fun getOrNull(position: Vector2): T? = getOrNull(position.x, position.y)
+
+    fun forEachRow(block: (row: List<T>) -> Unit) = cells.windowed(width, width).forEach(block)
+    fun forEachRowIndexed(block: (index: Int, row: List<T>) -> Unit) = cells.windowed(width, width).forEachIndexed(block)
+    fun <R> mapRows(block: (row: List<T>) -> R) = cells.windowed(width, width).map(block)
+    fun <R> mapRowsIndexed(block: (index: Int, row: List<T>) -> R) = cells.windowed(width, width).mapIndexed(block)
+
+    override val size: Int = width * height
+
+    override fun isEmpty(): Boolean {
+        return cells.isEmpty()
+    }
+
+    override fun iterator(): Iterator<T> {
+        return cells.iterator()
+    }
+
+    override fun containsAll(elements: Collection<T>): Boolean {
+        return cells.containsAll(elements)
+    }
+
+    override fun contains(element: T): Boolean {
+        return cells.contains(element)
+    }
+
+}
+
+fun <L> reconstructPath(cameFrom: Map<L, L>, end: L): List<L> {
+    val path = mutableListOf(end)
+    var current = end
+    while (current in cameFrom) {
+        current = cameFrom[current]!!
+        path.add(0, current)
+    }
+    return path
+}
+
+val FOURWAY_DIRECTIONS = listOf(
+    Vector2.LEFT,
+    Vector2.RIGHT,
+    Vector2.UP,
+    Vector2.DOWN
+)
+val EIGHTWAY_DIRECTIONS = listOf(
+    Vector2.LEFT,
+    Vector2.RIGHT,
+    Vector2.UP,
+    Vector2.DOWN,
+    Vector2.LEFT + Vector2.UP,
+    Vector2.LEFT + Vector2.DOWN,
+    Vector2.RIGHT + Vector2.UP,
+    Vector2.RIGHT + Vector2.DOWN
+)
+
+fun fourWayNeighbourhood(pos: Vector2): List<Vector2> {
+    return FOURWAY_DIRECTIONS.map { pos + it }
+}
+
+fun eightWayNeighbourhood(pos: Vector2): List<Vector2> {
+    return EIGHTWAY_DIRECTIONS.map { pos + it }
+}
+
+class MutableMapWithDefault<K, V>(val map: MutableMap<K,V>, val default: () -> V) : MutableMap<K, V> by map {
+    override fun get(key: K): V {
+        return map.getOrElse(key, default)
+    }
+}
+
+fun <K, V> MutableMap<K,V>.withDefault(default: () -> V): MutableMapWithDefault<K, V> {
+    return if (this is MutableMapWithDefault) {
+        MutableMapWithDefault(map, default)
+    } else {
+        MutableMapWithDefault(this, default)
+    }
+}
+
+fun <L> aStar(
+    start: L,
+    isGoal: (L) -> Boolean,
+    cost: (from: L, to: L) -> Int,
+    neighbourhood: (pos: L) -> List<L>,
+    heuristic: (pos: L) -> Int
+): List<L>? {
+    val cameFrom = mutableMapOf<L, L>()
+    val gScore = mutableMapOf<L, Int>().withDefault { Int.MAX_VALUE }
+    val fScore = mutableMapOf<L, Int>().withDefault { Int.MAX_VALUE }
+    val openSet = PriorityQueue<L> {
+        a, b -> fScore[a].compareTo(fScore[b])
+    }
+    gScore[start] = 0
+    fScore[start] = heuristic(start)
+    openSet.add(start)
+
+    while (openSet.isNotEmpty()) {
+        val current = openSet.remove()
+        if (isGoal(current)) {
+            return reconstructPath(cameFrom, current)
+        }
+        neighbourhood(current).forEach { neighbour ->
+            val tentativeGScore = gScore[current] + cost(current, neighbour)
+            if (tentativeGScore < gScore[neighbour]) {
+                cameFrom[neighbour] = current
+                gScore[neighbour] = tentativeGScore
+                fScore[neighbour] = tentativeGScore + heuristic(neighbour)
+                if (neighbour !in openSet) {
+                    openSet.add(neighbour)
+                }
+            }
+        }
+    }
+    return null
+}
+
+fun String.bold() = "\u001B[1m$this\u001B[0m"
+fun String.green() = "\u001B[32m$this\u001B[0m"
