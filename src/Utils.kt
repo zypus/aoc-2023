@@ -115,6 +115,7 @@ data class Vector2L(val x: Long = 0L, val y: Long = 0L) {
 
 operator fun Vector2L.plus(other: Vector2L) = Vector2L(x + other.x, y + other.y)
 operator fun Vector2L.minus(other: Vector2L) = Vector2L(x - other.x, y - other.y)
+operator fun Vector2L.unaryMinus(): Vector2L = Vector2L(-x, -y)
 
 operator fun Vector2L.times(factor: Int) = Vector2L(x * factor, y * factor)
 
@@ -282,4 +283,8 @@ fun <L> aStar(
 }
 
 fun String.bold() = "\u001B[1m$this\u001B[0m"
+fun String.red() = "\u001B[31m$this\u001B[0m"
 fun String.green() = "\u001B[32m$this\u001B[0m"
+fun String.yellow() = "\u001B[33m$this\u001B[0m"
+fun String.blue() = "\u001B[34m$this\u001B[0m"
+fun String.magenta() = "\u001B[35m$this\u001B[0m"
