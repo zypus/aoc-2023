@@ -171,17 +171,40 @@ fun Any?.println() = println(this)
 
 fun <E> Collection<E>.printlnEach() = forEach { println(it) }
 
-class Grid<T>(cells2D: List<List<T>>): Collection<T> {
+enum class GridBoundaryCondition {
+    EDGE,
+    WRAP
+}
+
+fun posMod(x: Int, y: Int): Int {
+    val m = x % y;
+    return if (m < 0) m + y else m
+}
+
+class Grid<T>(cells2D: List<List<T>>, val boundaryCondition: GridBoundaryCondition = GridBoundaryCondition.EDGE): Collection<T> {
 
     val width: Int = cells2D.getOrNull(0)?.size ?: 0
     val height: Int = cells2D.size
 
     val cells: List<T> = cells2D.flatten()
-    operator fun get(x: Int, y: Int): T = cells[y * width + x]
-    fun getOrNull(x: Int, y: Int): T? = if (x in 0..<width && y in 0..<height) {
+    operator fun get(x: Int, y: Int): T = when(boundaryCondition) {
+        GridBoundaryCondition.EDGE -> cells[y * width + x]
+        GridBoundaryCondition.WRAP -> cells[posMod(y, height) * width + posMod(x, width)]
+    }
+
+    fun isInBounds(x: Int, y: Int): Boolean = x in 0..<width && y in 0..<height
+    fun isInBounds(pos: Vector2): Boolean = isInBounds(pos.x, pos.y)
+
+    fun getOrNull(x: Int, y: Int): T? = if (boundaryCondition == GridBoundaryCondition.WRAP || isInBounds(x, y)) {
         get(x, y)
     } else {
         null
+    }
+
+    fun getNeighbors(pos: Vector2, isValid: (T) -> Boolean = { true }): List<T> {
+        return FOURWAY_DIRECTIONS.mapNotNull {
+            getOrNull(pos.x + it.x, pos.y + it.y)
+        }.filter(isValid)
     }
 
     operator fun get(position: Vector2): T = get(position.x, position.y)
