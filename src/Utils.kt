@@ -3,6 +3,8 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.pow
 
 data class AoCTask(val day: String) {
 
@@ -288,3 +290,34 @@ fun String.green() = "\u001B[32m$this\u001B[0m"
 fun String.yellow() = "\u001B[33m$this\u001B[0m"
 fun String.blue() = "\u001B[34m$this\u001B[0m"
 fun String.magenta() = "\u001B[35m$this\u001B[0m"
+
+fun primeFactors(value: Long): List<Long> {
+    var n = value
+    val factors = mutableListOf<Long>()
+    var i = 2L
+    while (i * i <= n) {
+        while (n % i == 0L) {
+            factors.add(i.toLong())
+            n /= i
+        }
+        i++
+    }
+    if (n > 1) {
+        factors.add(n)
+    }
+    return factors
+}
+
+/**
+ * Returns the smallest common product of a and b, by first getting the prime factors of a and b.
+ */
+fun leastCommonMultiple(a: Long, b: Long): Long {
+    val factorsA = primeFactors(a)
+    val factorsB = primeFactors(b)
+    val factorACounts = factorsA.groupBy { it }.mapValues { (_, values) -> values.size }
+    val factorBCounts = factorsB.groupBy { it }.mapValues { (_, values) -> values.size }
+    val allFactors = factorsA.toSet() + factorsB.toSet()
+    return allFactors.map {
+        it.toDouble().pow(max(factorACounts.getOrDefault(it, 0), factorBCounts.getOrDefault(it, 0))).toLong()
+    }.reduce { x, y -> x * y}
+}
