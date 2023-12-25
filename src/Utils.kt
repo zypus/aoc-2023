@@ -192,6 +192,8 @@ class Grid<T>(cells2D: List<List<T>>, val boundaryCondition: GridBoundaryConditi
         GridBoundaryCondition.WRAP -> cells[posMod(y, height) * width + posMod(x, width)]
     }
 
+    val rows: List<List<T>> get() = cells.windowed(width, width)
+
     fun isInBounds(x: Int, y: Int): Boolean = x in 0..<width && y in 0..<height
     fun isInBounds(pos: Vector2): Boolean = isInBounds(pos.x, pos.y)
 
@@ -313,6 +315,18 @@ fun String.green() = "\u001B[32m$this\u001B[0m"
 fun String.yellow() = "\u001B[33m$this\u001B[0m"
 fun String.blue() = "\u001B[34m$this\u001B[0m"
 fun String.magenta() = "\u001B[35m$this\u001B[0m"
+fun String.cyan() = "\u001B[36m$this\u001B[0m"
+
+fun String.boldBg() = "\u001B[1m$this\u001B[0m"
+fun String.redBg() = "\u001B[41m$this\u001B[0m"
+fun String.greenBg() = "\u001B[42m$this\u001B[0m"
+fun String.yellowBg() = "\u001B[43m$this\u001B[0m"
+fun String.blueBg() = "\u001B[44m$this\u001B[0m"
+fun String.magentaBg() = "\u001B[45m$this\u001B[0m"
+fun String.cyanBg() = "\u001B[46m$this\u001B[0m"
+
+
+
 
 fun primeFactors(value: Long): List<Long> {
     var n = value
