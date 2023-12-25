@@ -5,6 +5,7 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 data class AoCTask(val day: String) {
 
@@ -125,6 +126,25 @@ operator fun Int.times(vector: Vector2L) = Vector2L(vector.x * this, vector.y * 
 
 fun Vector2L.manhattanDistanceTo(other: Vector2L) = abs(x - other.x) + abs(y - other.y)
 
+data class Vector2D(val x: Double = 0.0, val y: Double = 0.0) {
+    override fun toString(): String {
+        return "($x,$y)"
+    }
+
+    companion object {
+        val ZERO = Vector2D(0.0, 0.0)
+        val LEFT = Vector2D(-1.0, 0.0)
+        val RIGHT = Vector2D(1.0, 0.0)
+        val UP = Vector2D(0.0, -1.0)
+        val DOWN = Vector2D(0.0, 1.0)
+    }
+}
+
+operator fun Vector2D.minus(other: Vector2D) = Vector2D(x - other.x, y - other.y)
+
+fun Vector2D.length() = sqrt(x * x + y * y)
+fun Vector2D.normalized() = Vector2D(x / length(), y / length())
+
 data class Vector3(val x: Int = 0, val y: Int = 0, val z: Int = 0) {
     override fun toString(): String {
         return "($x,$y,$z)"
@@ -138,9 +158,29 @@ operator fun Vector3.minus(other: Vector3) = Vector3(x - other.x, y - other.y, z
 
 operator fun Vector3.unaryMinus() = Vector3(-x, -y, -z)
 
+fun Vector3.cross(other: Vector3): Vector3 {
+    return Vector3(
+        y * other.z - other.y * z,
+        other.x * z - x * other.z,
+        x * other.y - other.x * y
+    )
+}
+
 fun Int.squared(): Long = this.toLong() * this.toLong()
 
 fun Vector3.squaredLength(): Long = x.squared() + y.squared() + z.squared()
+
+data class Vector3D(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0.0)
+
+fun Vector3D.cross(other: Vector3D): Vector3D {
+    return Vector3D(
+        y * other.z - other.y * z,
+        other.x * z - x * other.z,
+        x * other.y - other.x * y
+    )
+}
+
+data class Vector3L(val x: Long = 0, val y: Long = 0, val z: Long = 0)
 
 fun <T> List<T>.permutations(): List<List<T>> {
     return if (size == 1) {
