@@ -141,6 +141,9 @@ data class Vector2D(val x: Double = 0.0, val y: Double = 0.0) {
 }
 
 operator fun Vector2D.minus(other: Vector2D) = Vector2D(x - other.x, y - other.y)
+operator fun Vector2D.plus(other: Vector2D) = Vector2D(x + other.x, y + other.y)
+operator fun Vector2D.times(factor: Double) = Vector2D(x *factor, y * factor)
+operator fun Vector2D.div(divisor: Double) = Vector2D(x / divisor, y / divisor)
 
 fun Vector2D.length() = sqrt(x * x + y * y)
 fun Vector2D.normalized() = Vector2D(x / length(), y / length())
@@ -170,7 +173,28 @@ fun Int.squared(): Long = this.toLong() * this.toLong()
 
 fun Vector3.squaredLength(): Long = x.squared() + y.squared() + z.squared()
 
-data class Vector3D(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0.0)
+data class Vector3D(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0.0)  {
+    override fun toString(): String {
+        return "($x,$y,$z)"
+    }
+}
+
+val Vector3D.xy: Vector2D get() = Vector2D(x, y)
+
+operator fun Vector3D.plus(other: Vector3D) = Vector3D(x + other.x, y + other.y, z + other.z)
+operator fun Vector3D.minus(other: Vector3D) = Vector3D(x - other.x, y - other.y, z - other.z)
+operator fun Vector3D.unaryMinus(): Vector3D = Vector3D(-x, -y, -z)
+
+operator fun Vector3D.times(factor: Double) = Vector3D(x * factor, y * factor, z * factor)
+operator fun Vector3D.div(divider: Double) = Vector3D(x / divider, y / divider, z / divider)
+
+fun Vector3D.toVector3L(): Vector3L = Vector3L(x.toLong(), y.toLong(), z.toLong())
+
+fun Vector3D.length() = sqrt(x * x + y * y + z * z)
+
+fun Vector3D.normalized() = Vector3D(x / length(), y / length(), z / length())
+
+fun Vector3D.dot(other: Vector3D) = x * other.x + y * other.y + z * other.z
 
 fun Vector3D.cross(other: Vector3D): Vector3D {
     return Vector3D(
@@ -180,7 +204,20 @@ fun Vector3D.cross(other: Vector3D): Vector3D {
     )
 }
 
-data class Vector3L(val x: Long = 0, val y: Long = 0, val z: Long = 0)
+data class Vector3L(val x: Long = 0, val y: Long = 0, val z: Long = 0) {
+    override fun toString(): String {
+        return "($x,$y,$z)"
+    }
+}
+
+operator fun Vector3L.plus(other: Vector3L) = Vector3L(x + other.x, y + other.y, z + other.z)
+operator fun Vector3L.minus(other: Vector3L) = Vector3L(x - other.x, y - other.y, z - other.z)
+operator fun Vector3L.unaryMinus(): Vector3L = Vector3L(-x, -y, -z)
+
+operator fun Vector3L.times(factor: Long) = Vector3L(x * factor, y * factor, z * factor)
+operator fun Vector3L.div(divider: Long) = Vector3L(x / divider, y / divider, z / divider)
+
+fun Vector3L.toVector3D(): Vector3D = Vector3D(x.toDouble(), y.toDouble(), z.toDouble())
 
 fun <T> List<T>.permutations(): List<List<T>> {
     return if (size == 1) {
